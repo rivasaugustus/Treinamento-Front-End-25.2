@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/common/ToastProvider";
+import { CartProvider } from "@/hooks/use-card";
 
 const rubik = Rubik({
   variable: "--font-rubik",
@@ -23,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${rubik.variable} antialiased`}
       >
-        {children}
+        <CartProvider>{children}</CartProvider>
 
         <ToastProvider />
       </body>
