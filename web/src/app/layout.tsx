@@ -10,8 +10,7 @@ const rubik = Rubik({
 })
 
 export const metadata: Metadata = {
-  title: "Noctiluz",
-  description: "Plataforma para olimpíadas científicas e reforço escolar",
+  title: "Puffle Store",
 };
 
 export default function RootLayout({

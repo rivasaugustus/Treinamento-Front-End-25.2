@@ -16,7 +16,7 @@ export function RemoveButton({puffle}: RemoveButtonProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      <Button variant="outline" size="icon" className="rounded-full size-4 ml-2 mr-1 bg-red-400" onClick={() => removeFromCart(puffle)}>
+      <Button variant="outline" size="icon" className="rounded-full size-4 ml-2 mr-1 bg-red-400 cursor-pointer" onClick={() => removeFromCart(puffle)}>
         <ArrowDownIcon />
       </Button>
     </div>

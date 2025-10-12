@@ -26,7 +26,7 @@ export function CartButton() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="absolute right-20 cursor-pointer" variant="outline"><ShoppingCart size={50} /></Button>
+                <Button className="cursor-pointer" variant="outline"><ShoppingCart size={50} /></Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>

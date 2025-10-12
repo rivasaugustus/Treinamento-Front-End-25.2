@@ -5,9 +5,9 @@ import Image, { StaticImageData } from "next/image";
 import blue_puffle from "./imgs/blue_puffle.png";
 import golden_puffle from "./imgs/golden_puffle.png";
 import rainbow_puffle from "./imgs/rainbow_puffle.png"
-import unicorn_puffle from "./imgs/blue_puffle.png"
-import diamond_puffle from "./imgs/blue_puffle.png"
-import black_puffle from "./imgs/blue_puffle.png"
+import pink_puffle from "./imgs/pink_puffle.png"
+import diamond_puffle from "./imgs/diamond_puffle.png"
+import black_puffle from "./imgs/black_puffle.png"
 import { useCart } from "@/hooks/use-card";
 
 
@@ -40,7 +40,7 @@ export class Puffle {
 const bluePuffle = new Puffle("Puffle Azul", 400, blue_puffle);
 const rainbowPuffle = new Puffle("Puffle Arco-Íris", 800, rainbow_puffle);
 const goldenPuffle = new Puffle("Puffle Dourado", 5000, golden_puffle);
-const unicornPuffle = new Puffle("Puffle Unicórnio", 1200, unicorn_puffle);
+const unicornPuffle = new Puffle("Puffle Rosa", 1200, pink_puffle);
 const diamondPuffle = new Puffle("Puffle Diamante", 8000, diamond_puffle);
 const blackPuffle = new Puffle("Puffle Preto", 1200, black_puffle);
 
@@ -50,6 +50,7 @@ export const ProdutoCard = ({ type }: ProdutoCardProps) => {
     } = useCart();
 
     const puffle = getPuffle(type);
+    
     return (
         
         <div>

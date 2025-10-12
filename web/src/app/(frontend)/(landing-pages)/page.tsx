@@ -1,10 +1,11 @@
 
+import { Header } from "@/components/Header";
 import { ProdutoCard } from "@/components/ProdutoCard";
-import { CartButton  } from "@/components/cartButton";
+
 export default async function Home() {
   return (
     <div className="bg-[#326497]">
-      <CartButton/>
+      <Header/>
       <div className="ml-22 grid grid-cols-3 gap-6 content-evenly">
         <div><ProdutoCard type={1} /></div>
         <div><ProdutoCard type={2} /></div>        
