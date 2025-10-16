@@ -17,8 +17,6 @@ type ProdutoCardProps = {
     type: number;
 }
 
-
-
 function getPuffle(type: number): Puffle {
     const puffle = puffleList[type - 1];
     return puffle;

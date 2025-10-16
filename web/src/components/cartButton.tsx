@@ -35,7 +35,7 @@ export function CartButton() {
                             {lista.map((item, i) => (
                                 <li key={i} className="flex justify-between m-2">
                                     <span>{item.name}</span>
-                                    <RemoveButton puffle={item}/>
+                                    <RemoveButton puffle={item} />
                                 </li>
                             ))}
                             <br></br>
