@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createProduct, getAllProducts } from "../../services/products";
 import { AllowedRoutes } from "@/types";
 import { blockForbiddenRequests, returnInvalidDataErrors, validBody, zodErrorHandler } from "@/utils";
-import { createProductSchema } from "../../schemas/products.schema";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { createPurchase, getAllPurchases } from "../../services/purchases";
+import { createPurchaseSchema } from "../../schemas/purchases.schema";
 
 const allowedRoles: AllowedRoutes = {
     POST: ["SUPER_ADMIN", "ADMIN"]
@@ -11,13 +11,13 @@ const allowedRoles: AllowedRoutes = {
 
 export async function GET() {
     try {
-        const products = await getAllProducts();
+        const purchases = await getAllPurchases();
 
-        return NextResponse.json(products, { status: 200 });
+        return NextResponse.json(purchases, { status: 200 });
     } catch (error) {
-        console.error('Erro ao buscar produtos', error);
+        console.error('Erro ao buscar compras.', error);
         return NextResponse.json(
-            { error: 'Falha ao buscar produtos' },
+            { error: 'Falha ao buscar compras.' },
             { status: 500 }
         )
     }
@@ -32,16 +32,16 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await validBody(req);
-        const validationResult = createProductSchema.safeParse(body);
+        const validationResult = createPurchaseSchema.safeParse(body);
 
         if (!validationResult.success) {
             return returnInvalidDataErrors(validationResult.error);
         }
 
         const validatedData = validationResult.data;
-        const product = await createProduct(validatedData);
+        const purchase = await createPurchase(validatedData);
 
-        return NextResponse.json(product, { status: 201 });
+        return NextResponse.json(purchase, { status: 201 });
     } catch (error) {
         if (error instanceof NextResponse) {
             return error;
@@ -49,28 +49,15 @@ export async function POST(req: NextRequest) {
 
         if (error instanceof Error) {
             if (error.message.includes('Unique constraint')) {
-                if (error.message.includes('name')) {
+                if (error.message.includes('Prisma')) {
                     return NextResponse.json(
-                        toErrorMessage('Uma produto com esse nome já existe'),
-                        { status: 409 }
+                        toErrorMessage('Erro no banco de dados - Verifique os dados fornecidos'),
+                        { status: 400 }
                     )
                 }
-                return NextResponse.json(
-                    toErrorMessage('Um produto com esses dados já existe'),
-                    { status: 409 }
-                )
             }
 
-            if (error.message.includes('Prisma')) {
-                return NextResponse.json(
-                    toErrorMessage('Erro no banco de dados - Verifique os dados fornecidos'),
-                    { status: 400 }
-                )
-            }
+            return zodErrorHandler(error);
         }
-
-        return zodErrorHandler(error);
     }
 }
-
-

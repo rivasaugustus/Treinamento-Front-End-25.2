@@ -56,6 +56,18 @@ export async function createPurchase(data: { id: string, totalPrice: number }) {
     }
 }
 
+export async function updatePurchase(data: { id: string, totalPrice: number}) {
+    try {
+        const purchase = await prisma.purchase.update({
+            where: { id: data.id },
+            data: { totalPrice: data.totalPrice},
+        })
+        return purchase;
+    } catch (error) {
+        throw new Error(String(error) || 'Falha ao atualizar compra.');
+    }
+}
+
 export async function deletePurchaseById(id: string) {
     try {
         const product = await prisma.purchase.delete({

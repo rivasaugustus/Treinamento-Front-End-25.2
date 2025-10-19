@@ -49,6 +49,22 @@ export async function createProduct(data: { name: string, desc: string, price: n
     }
 }
 
+export async function updateProduct(data: { id: string, name: string, desc: string, price: number }) {
+    try {
+        const product = await prisma.product.update({
+            where: { id: data.id },
+            data: {
+                name: data.name,
+                desc: data.desc,
+                price: data.price
+            }
+        })
+        return product
+    } catch (error) {
+        throw new Error( String(error) || 'Falha ao atualizar produto.');
+    }
+}
+
 export async function deleteProduct(id: string) {
     try {
         const product = await prisma.product.delete({

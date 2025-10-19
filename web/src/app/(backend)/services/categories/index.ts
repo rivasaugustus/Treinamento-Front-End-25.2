@@ -1,6 +1,6 @@
 import prisma from "../db";
 
-export async function getCategories() {
+export async function getAllCategories() {
     try {
         const categories = await prisma.category.findMany();
         return categories;
@@ -32,6 +32,21 @@ export async function createCategory(data: { name: string }) {
         return category;
     } catch (error) {
         throw new Error(String(error) || 'Falha ao criar categoria.');
+    }
+}
+
+export async function updateCategory(data: { id: string, name: string }) {
+    try {
+        const product = await prisma.product.update({
+            where: { id: data.id },
+            data: {
+                name: data.name,
+
+            }
+        })
+        return product
+    } catch (error) {
+        throw new Error( String(error) || 'Falha ao atualizar produto.');
     }
 }
 

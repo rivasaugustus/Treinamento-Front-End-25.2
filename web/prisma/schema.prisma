@@ -149,7 +149,7 @@ model Product {
 
 model Category {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  name       String
+  name       String    @unique
   productIDs String[]  @db.ObjectId
   products   Product[] @relation(fields: [productIDs], references: [id])
 }
