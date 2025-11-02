@@ -17,13 +17,29 @@ export async function getPurchaseById(id: string) {
     try {
         const purchase = await prisma.purchase.findUnique({
             where: {
-                id,
+                id: id
+            },
+            include: {
+                products: true
             }
         });
         return purchase;
     } catch (error) {
         throw new Error(String(error) || 'Falha ao buscar a compra.');
     }
+}
+
+export async function getTotalPrice(id: string) {
+    const purchase = await prisma.purchase.findUnique({
+        where: { id: id },
+        include: { products: true }, 
+    });
+
+    if (!purchase) throw new Error("Compra não encontrada");
+
+    const total = purchase.products.reduce((sum, product) => sum + product.price, 0);
+
+    return total;
 }
 
 export async function getPurchasesByUserId(id: string) {
@@ -56,11 +72,11 @@ export async function createPurchase(data: { id: string, totalPrice: number }) {
     }
 }
 
-export async function updatePurchase(data: { id: string, totalPrice: number}) {
+export async function updatePurchase(data: { id: string, totalPrice: number }) {
     try {
         const purchase = await prisma.purchase.update({
             where: { id: data.id },
-            data: { totalPrice: data.totalPrice},
+            data: { totalPrice: data.totalPrice },
         })
         return purchase;
     } catch (error) {
@@ -80,3 +96,4 @@ export async function deletePurchaseById(id: string) {
         throw new Error(String(error) || 'Falha ao deletar compra.');
     }
 }
+

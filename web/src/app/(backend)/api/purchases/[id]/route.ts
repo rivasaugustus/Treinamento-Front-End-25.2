@@ -31,6 +31,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 { status: 404 }
             )
         }
+
+        return purchase;
     } catch (error) {
         if (error instanceof NextResponse) {
             return error;

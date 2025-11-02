@@ -133,6 +133,7 @@ model Verification {
 model Usuario {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   name      String
+  email     String     @unique
   purchases Purchase[]
 }
 
@@ -140,11 +141,12 @@ model Product {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   name         String     @unique
   desc         String
-  price        Int
+  price        Float
   categoryIDs  String[]   @db.ObjectId
   categories   Category[] @relation(fields: [categoryIDs], references: [id])
   purchasesIDs String[]   @db.ObjectId
   purchases    Purchase[] @relation(fields: [purchasesIDs], references: [id])
+  timesBought  Int
 }
 
 model Category {

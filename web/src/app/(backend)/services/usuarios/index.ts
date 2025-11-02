@@ -22,7 +22,7 @@ export async function getUsuarioById(id: string) {
     }
 }
 
-export async function createUsuario(data: { name: string }) {
+export async function createUsuario(data: { name: string, email: string, password: string }) {
     try {
         const usuario = await prisma.usuario.create({
             data: {
