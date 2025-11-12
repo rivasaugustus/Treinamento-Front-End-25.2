@@ -1,7 +1,4 @@
-import { promise } from "zod";
 import prisma from "../db";
-import { getUsuarioById } from "../usuarios";
-import { UserRoundIcon } from "lucide-react";
 
 export async function getAllPurchases() {
     try {
@@ -96,4 +93,42 @@ export async function deletePurchaseById(id: string) {
         throw new Error(String(error) || 'Falha ao deletar compra.');
     }
 }
+
+export async function getStatusById(id: string) {
+    try {
+        const property = await prisma.purchase.findUnique({
+            where: { id: id },
+            include: {
+                status: true
+            }
+        })
+        
+        return property;
+    } catch (error) {
+        return;
+    }
+}
+
+export enum status {
+  pending,
+  paid,
+  shipped,
+  delivered,
+  cancelled
+}
+
+export async function changeStatus(id: string, status: status) {
+    try {
+            const purchase = await prisma.purchase.update({
+            where: { id: id},
+            data: { status: status },
+        })
+
+        return purchase;
+    } catch (error) {
+        return;
+    }
+}
+
+
 

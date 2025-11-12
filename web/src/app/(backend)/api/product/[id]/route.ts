@@ -2,6 +2,7 @@ import { idSchema } from "@/app/(backend)/schemas";
 import { createProductSchema, updateProductSchema } from "@/app/(backend)/schemas/products.schema";
 import { deleteProduct, getProductById, updateProduct } from "@/app/(backend)/services/products";
 import { updatePurchase } from "@/app/(backend)/services/purchases";
+import { authMiddleware } from "@/middleware/auth";
 import { AllowedRoutes } from "@/types";
 import { blockForbiddenRequests, returnInvalidDataErrors, validBody, zodErrorHandler } from "@/utils";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
@@ -33,6 +34,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
                 { status: 404 }
             )
         }
+
+        return product;
     } catch (error) {
         if (error instanceof NextResponse) {
             return error;
@@ -59,19 +62,19 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 }
 
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, name: string, desc: string, price: number }>}) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string, name: string, desc: string, price: number }> }) {
     try {
-    const forbidden = await blockForbiddenRequests(req, allowedRoles.POST);
-    const { id, name, desc, price } = await params;
+        const middleware = await authMiddleware(req);
 
-    if (forbidden) {
-        return forbidden
-    }
-    
-    const product = await updateProduct({id, name, desc, price});
-    return NextResponse.json({ string: "Produto atualizado no banco de dados."}, { status: 200 });
-    
+        if (middleware) {
+            return middleware;
+        }
+        const { id, name, desc, price } = await params;
+
+
+        const product = await updateProduct({ id, name, desc, price });
+        return NextResponse.json({ string: "Produto atualizado no banco de dados." }, { status: 200 });
     } catch (error) {
-        throw new Error(String(error) ||  'Falha ao atualizar produto.');
+        throw new Error(String(error) || 'Falha ao atualizar produto.');
     }
 }

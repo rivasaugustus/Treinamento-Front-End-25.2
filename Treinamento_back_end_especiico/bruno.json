@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Treinamento_back_end_especiico",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

@@ -4,6 +4,7 @@ import { blockForbiddenRequests, returnInvalidDataErrors, validBody, zodErrorHan
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
 import { createPurchase, getAllPurchases } from "../../services/purchases";
 import { createPurchaseSchema } from "../../schemas/purchases.schema";
+import { authMiddleware } from "@/middleware/auth";
 
 const allowedRoles: AllowedRoutes = {
     POST: ["SUPER_ADMIN", "ADMIN"]
@@ -25,10 +26,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const forbidden = await blockForbiddenRequests(req, allowedRoles.POST);
+        const middleware = await authMiddleware(req);
 
-        if (forbidden) {
-            return forbidden;
+        if (middleware) {
+            return middleware;
         }
 
         const body = await validBody(req);
