@@ -4,6 +4,10 @@ import { AllowedRoutes } from "@/types";
 import { blockForbiddenRequests, returnInvalidDataErrors, validBody, zodErrorHandler } from "@/utils";
 import { createProductSchema } from "../../schemas/products.schema";
 import { toErrorMessage } from "@/utils/api/toErrorMessage";
+import { authMiddleware } from "@/middleware/auth";
+import { s3 } from "@/lib/s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { V } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
 
 const allowedRoles: AllowedRoutes = {
     POST: ["SUPER_ADMIN", "ADMIN"]
@@ -25,21 +29,65 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const forbidden = await blockForbiddenRequests(req, allowedRoles.POST);
+        const middleware = await authMiddleware(req);
 
-        if (forbidden) {
-            return forbidden;
+        if (middleware) {
+            return middleware;
         }
 
-        const body = await validBody(req);
+        // --- PEGAR FORM-DATA (necessário para arquivos) ---
+        const form = await req.formData();
+
+        // dados comuns
+        const name = form.get("name");
+        const price = form.get("price");
+
+        // arquivo da imagem
+        const file = form.get("image") as File | null;
+
+        if (!file) {
+            return NextResponse.json(
+                { error: "A imagem é obrigatória." },
+                { status: 400 }
+            );
+        }
+
+        // --- VALIDAR BODY (converte formData pra objeto normal) ---
+        const body = { name, price };
         const validationResult = createProductSchema.safeParse(body);
 
         if (!validationResult.success) {
-            return returnInvalidDataErrors(validationResult.error);
+            return NextResponse.json(
+                { error: "Dados inválidos", details: validationResult.error },
+                { status: 400 }
+            );
         }
 
         const validatedData = validationResult.data;
-        const product = await createProduct(validatedData);
+
+        // --- UPLOAD PARA O S3 ---
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        const fileName = `products/${Date.now()}-${file.name}`;
+
+        await s3.send(
+            new PutObjectCommand({
+                Bucket: process.env.AWS_BUCKET_NAME!,
+                Key: fileName,
+                Body: buffer,
+                ContentType: file.type,
+                ACL: "public-read",
+            })
+        );
+
+        const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
+
+
+        const product = await createProduct({
+            ...validatedData,
+            imageUrl,
+        });
 
         return NextResponse.json(product, { status: 201 });
     } catch (error) {

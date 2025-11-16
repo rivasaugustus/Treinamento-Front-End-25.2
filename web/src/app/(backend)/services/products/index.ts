@@ -34,13 +34,15 @@ export async function getProductByName(name: string) {
     }
 }
 
-export async function createProduct(data: { name: string, desc: string, price: number }) {
+export async function createProduct(data: { name: string, desc: string, price: number, imageUrl: string }) {
     try {
         const product = await prisma.product.create({
             data: {
                 name: data.name,
                 desc: data.desc,
-                price: data.price
+                price: data.price,
+                imageURL: data.imageUrl,
+                timesBought: 0
             }
         })
         return product
@@ -49,14 +51,15 @@ export async function createProduct(data: { name: string, desc: string, price: n
     }
 }
 
-export async function updateProduct(data: { id: string, name: string, desc: string, price: number }) {
+export async function updateProduct(data: { id: string, name: string, desc: string, price: number, imageUrl: string }) {
     try {
         const product = await prisma.product.update({
             where: { id: data.id },
             data: {
                 name: data.name,
                 desc: data.desc,
-                price: data.price
+                price: data.price,
+                imageURL: data.imageUrl
             }
         })
         return product

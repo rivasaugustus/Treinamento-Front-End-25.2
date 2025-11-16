@@ -1,4 +1,5 @@
 import prisma from "../db";
+import { sendEmail } from "../send";
 
 export async function getAllPurchases() {
     try {
@@ -17,7 +18,8 @@ export async function getPurchaseById(id: string) {
                 id: id
             },
             include: {
-                products: true
+                products: true,
+                user: true
             }
         });
         return purchase;
@@ -29,7 +31,7 @@ export async function getPurchaseById(id: string) {
 export async function getTotalPrice(id: string) {
     const purchase = await prisma.purchase.findUnique({
         where: { id: id },
-        include: { products: true }, 
+        include: { products: true },
     });
 
     if (!purchase) throw new Error("Compra não encontrada");
@@ -102,27 +104,42 @@ export async function getStatusById(id: string) {
                 status: true
             }
         })
-        
+
         return property;
     } catch (error) {
         return;
     }
 }
 
-export enum status {
-  pending,
-  paid,
-  shipped,
-  delivered,
-  cancelled
+export enum Status {
+    pending = 'pending',
+    paid = 'paid',
+    shipped = 'shipped',
+    delivered = 'delivered',
+    cancelled = 'cancelled'
 }
 
-export async function changeStatus(id: string, status: status) {
+export async function changeStatus(id: string, status: Status) {
     try {
-            const purchase = await prisma.purchase.update({
-            where: { id: id},
+        const purchase = await prisma.purchase.update({
+            where: { id: id },
             data: { status: status },
         })
+
+        const compra = await getPurchaseById(id);
+
+        if (compra && compra.user) {
+            const userEmail = compra.user.email;
+            switch (status) {
+                case Status.paid:
+                    sendEmail(userEmail, "Pagamento confirmado", status)
+                case Status.shipped:
+                    sendEmail(userEmail, "Seu pedido foi enviado", status)
+                case Status.delivered:
+                    sendEmail(userEmail, "Seu pedido foi entregue com sucesso", status)
+            }
+
+        }
 
         return purchase;
     } catch (error) {
