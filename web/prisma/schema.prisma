@@ -16,18 +16,18 @@ enum Role {
 
 model User {
   // nao mexer >
-  id            String    @id @default(uuid()) @map("_id")
+  id            String   @id @default(uuid()) @map("_id")
   name          String
-  email         String    @unique
+  email         String   @unique
   emailVerified Boolean?
   image         String?
-  role          Role      @default(USER)
+  role          Role     @default(USER)
   // < nao mexer 
 
-  createdAt  DateTime
-  updatedAt  DateTime
-  sessions   Session[]
-  accounts   Account[]
+  createdAt DateTime
+  updatedAt DateTime
+  sessions  Session[]
+  accounts  Account[]
 
   @@map("user")
 }
@@ -68,7 +68,7 @@ model Licao {
   descricao String
   archived  Boolean? @default(false)
 
-  conteudo     Conteudo[]
+  conteudo Conteudo[]
 }
 
 model Conteudo {
@@ -127,4 +127,51 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+//Já existe User
+model Usuario {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String     @unique
+  purchases Purchase[]
+}
+
+model Product {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String     @unique
+  desc         String
+  price        Float
+  categoryIDs  String[]   @db.ObjectId
+  categories   Category[] @relation(fields: [categoryIDs], references: [id])
+  purchasesIDs String[]   @db.ObjectId
+  purchases    Purchase[] @relation(fields: [purchasesIDs], references: [id])
+  timesBought  Int
+  imageURL     String
+}
+
+model Category {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String    @unique
+  productIDs String[]  @db.ObjectId
+  products   Product[] @relation(fields: [productIDs], references: [id])
+}
+
+enum PurchaseStatus {
+  pending
+  paid
+  shipped
+  delivered
+  cancelled
+}
+
+model Purchase {
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
+  usuarioIDs String[]       @db.ObjectId
+  user       Usuario        @relation(fields: [usuarioIDs], references: [id])
+  totalPrice Float
+  productIDs String[]       @db.ObjectId
+  products   Product[]      @relation(fields: [productIDs], references: [id])
+  status     PurchaseStatus @default(pending)
+  email      String
 }
